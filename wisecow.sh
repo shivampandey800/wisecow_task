@@ -1,46 +1,41 @@
-#!/usr/bin/env bash
+k#!/usr/bin/env bash
+# Include Debian games binaries in PATH
+export PATH=$PATH:/usr/games
 
 SRVPORT=4499
-RSPFILE=response
 
-rm -f $RSPFILE
-mkfifo $RSPFILE
-
-get_api() {
-	read line
-	echo $line
+# Check prerequisites
+prerequisites() {
+    command -v /usr/games/cowsay >/dev/null 2>&1 &&
+    command -v /usr/games/fortune >/dev/null 2>&1 &&
+    command -v nc >/dev/null 2>&1 ||
+    { echo "Install prerequisites."; exit 1; }
 }
 
+# Handle HTTP request
 handleRequest() {
-    # 1) Process the request
-	get_api
-	mod=`fortune`
+    mod=$(/usr/games/fortune)
+    body=$(/usr/games/cowsay "$mod")
+    cat <<EOF
+HTTP/1.1 200 OK
+Content-Type: text/html
+Content-Length: ${#body}
 
-cat <<EOF > $RSPFILE
-HTTP/1.1 200
-
-
-<pre>`cowsay $mod`</pre>
+<pre>$body</pre>
 EOF
 }
 
-prerequisites() {
-	command -v cowsay >/dev/null 2>&1 &&
-	command -v fortune >/dev/null 2>&1 || 
-		{ 
-			echo "Install prerequisites."
-			exit 1
-		}
-}
+# Trap CTRL+C to exit cleanly
+trap "echo 'Shutting down...'; exit 0" SIGINT SIGTERM
 
 main() {
-	prerequisites
-	echo "Wisdom served on port=$SRVPORT..."
-
-	while [ 1 ]; do
-		cat $RSPFILE | nc -lN $SRVPORT | handleRequest
-		sleep 0.01
-	done
+    prerequisites
+    echo "Wisdom served on port=$SRVPORT..."
+    while true; do
+        # OpenBSD netcat (-k keep open, -l listen, -p port, -q 1 auto-close after 1 sec)
+        handleRequest | nc -l -p $SRVPORT -q 1
+    done
 }
 
 main
+
