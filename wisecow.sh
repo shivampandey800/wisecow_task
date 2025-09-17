@@ -1,4 +1,4 @@
-k#!/usr/bin/env bash
+#!/usr/bin/env bash
 # Include Debian games binaries in PATH
 export PATH=$PATH:/usr/games
 

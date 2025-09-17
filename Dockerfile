@@ -13,13 +13,14 @@ RUN apt-get update && \
         bash \
         cowsay \
         fortune-mod \
-        fortunes-min \
-        netcat && \
+        fortunes \
+
+        netcat-openbsd && \
     chmod +x wisecow.sh && \
     rm -rf /var/lib/apt/lists/*
 
 # Expose port
 EXPOSE 4499
 
-# Run Wisecow script
-CMD ["./wisecow.sh"]
+# Run Wisecow script explicitly with bash
+CMD ["bash", "./wisecow.sh"]
