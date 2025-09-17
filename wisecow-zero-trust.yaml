@@ -1,0 +1,34 @@
+apiVersion: security.kubearmor.com/v1
+kind: KubeArmorPolicy
+metadata:
+  name: wisecow-zero-trust
+spec:
+  severity: 5
+  message: "Zero Trust Policy for Wisecow"
+  selector:
+    matchLabels:
+      app: wisecow   # ✅ must be lowercase "app"
+  file:
+    matchDirectories:
+      - dir: /etc/
+        recursive: true
+        action: Block
+      - dir: /home/wisecow/data/
+        recursive: true
+        action: Allow
+  process:
+    matchPaths:
+      - path: /usr/games/cowsay
+        action: Allow
+      - path: /usr/games/fortune
+        action: Allow
+      - path: /bin/sh
+        action: Allow
+      - path: /usr/bin/python3
+        action: Allow
+      - path: /usr/bin/curl
+        action: Block
+      - path: /bin/ls
+        action: Block
+      - path: /bin/cat
+        action: Block

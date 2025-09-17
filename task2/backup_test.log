@@ -1,0 +1,8 @@
+---- Backup Job: Wed Sep 17 13:06:03 IST 2025 ----
+sending incremental file list
+sample.txt
+
+sent 192 bytes  received 35 bytes  454.00 bytes/sec
+total size is 63  speedup is 0.28
+Backup completed successfully.
+--------------------------------------
